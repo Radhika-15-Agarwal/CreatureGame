@@ -5,6 +5,8 @@ var level := 1
 
 var exploring := false
 
+var home_position : Vector2
+
 func gain_xp(amount):
 	xp += amount
 
@@ -22,10 +24,23 @@ func explore():
 
 	print("Creature left to explore")
 
+	var tween = create_tween()
+	tween.tween_property(self, "position", position + Vector2(300, 0), 1.0)
+
+	await tween.finished
+
 	await get_tree().create_timer(2.0).timeout
+
+	var return_tween = create_tween()
+	return_tween.tween_property(self, "position", home_position, 1.0)
+
+	await return_tween.finished
 
 	gain_xp(5)
 
 	exploring = false
 
 	print("Creature returned")
+	
+func _ready():
+	home_position = position

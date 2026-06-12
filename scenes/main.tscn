@@ -9,16 +9,25 @@
 script = ExtResource("1_0wfyh")
 
 [node name="Creature" type="CharacterBody2D" parent="." unique_id=134566905]
+position = Vector2(200, 300)
 script = ExtResource("1_o5qli")
 
 [node name="Sprite2D" type="Sprite2D" parent="Creature" unique_id=1062767993]
+scale = Vector2(48, 48)
 texture = SubResource("PlaceholderTexture2D_7dm0k")
+
+[node name="Label" type="Label" parent="Creature" unique_id=2103811530]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Creature"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=954910228]
 
 [node name="ExploreButton" type="Button" parent="CanvasLayer" unique_id=621618044]
-offset_right = 8.0
-offset_bottom = 8.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 87.0
+offset_bottom = 51.0
 text = "Explore"
 
 [connection signal="pressed" from="CanvasLayer/ExploreButton" to="." method="_on_explore_button_pressed"]
