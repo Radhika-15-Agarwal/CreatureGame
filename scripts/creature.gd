@@ -2,12 +2,15 @@ extends CharacterBody2D
 
 var xp := 0
 var level := 1
-var energy := 100
-var max_energy := 100
+var energy := 100.0
+var max_energy := 100.0
 
 var exploring := false
 
 var home_position : Vector2
+
+var energy_cost := 20.0
+var energy_recovery_rate := 0.5
 
 signal stats_changed
 
@@ -31,7 +34,7 @@ func explore():
 		return
 
 	exploring = true
-	energy -= 20
+	energy -= energy_cost
 	stats_changed.emit()
 
 	print("Creature left to explore")
@@ -57,3 +60,13 @@ func explore():
 	
 func _ready():
 	home_position = position
+	
+func _process(delta):
+	if exploring:
+		return
+
+	if energy < max_energy:
+		energy += delta * energy_recovery_rate
+		energy = min(energy, max_energy)
+
+		stats_changed.emit()

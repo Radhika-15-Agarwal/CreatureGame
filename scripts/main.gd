@@ -24,6 +24,6 @@ func update_ui():
 		state_label.text = "State: Idle"
 		
 	energy_label.text = "Energy: %d/%d" % [
-		creature.energy,
-		creature.max_energy
+		int(creature.energy),
+		int(creature.max_energy)
 	]
