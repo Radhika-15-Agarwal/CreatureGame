@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://t4yjrpkeoqbo"]
+
+[ext_resource type="Script" uid="uid://d2ml2go18epr2" path="res://scripts/main.gd" id="1_0wfyh"]
+[ext_resource type="Script" uid="uid://ho5w2jefd3l" path="res://scripts/creature.gd" id="1_o5qli"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_7dm0k"]
+
+[node name="Main" type="Node2D" unique_id=1959341869]
+script = ExtResource("1_0wfyh")
+
+[node name="Creature" type="CharacterBody2D" parent="." unique_id=134566905]
+script = ExtResource("1_o5qli")
+
+[node name="Sprite2D" type="Sprite2D" parent="Creature" unique_id=1062767993]
+texture = SubResource("PlaceholderTexture2D_7dm0k")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=954910228]
+
+[node name="ExploreButton" type="Button" parent="CanvasLayer" unique_id=621618044]
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Explore"
+
+[connection signal="pressed" from="CanvasLayer/ExploreButton" to="." method="_on_explore_button_pressed"]
