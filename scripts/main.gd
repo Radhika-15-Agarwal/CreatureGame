@@ -19,10 +19,7 @@ func update_ui():
 	level_label.text = "Level: %d" % creature.level
 	xp_label.text = "XP: %d" % creature.xp
 
-	if creature.exploring:
-		state_label.text = "State: Exploring"
-	else:
-		state_label.text = "State: Idle"
+	state_label.text = "State: " + creature.get_state()
 		
 	energy_label.text = "Energy: %d/%d" % [
 		int(creature.energy),

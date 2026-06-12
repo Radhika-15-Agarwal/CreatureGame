@@ -78,3 +78,11 @@ func get_mood():
 		return "Okay"
 	else:
 		return "Tired"
+		
+func get_state():
+	if exploring:
+		return "Exploring"
+	elif energy < max_energy:
+		return "Resting"
+	else:
+		return "Idle"
