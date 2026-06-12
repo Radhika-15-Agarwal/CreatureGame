@@ -3,16 +3,23 @@ extends CharacterBody2D
 # Progression
 var xp := 0
 var level := 1
+var xp_per_level := 10
 
 # Energy
 var energy := 100.0
 var max_energy := 100.0
 var energy_recovery_rate := 0.5
 
+# Mood
+var happy_energy_threshold := 70.0
+var okay_energy_threshold := 30.0
+
 # Exploration
 var exploration_energy_cost := 20.0
 var exploration_xp_reward := 5
 var exploration_duration := 2.0
+var exploration_distance := 300.0
+var travel_duration := 1.0
 
 # Rewards
 var berry_reward := 1
@@ -30,7 +37,7 @@ signal stats_changed
 func gain_xp(amount):
 	xp += amount
 
-	if xp >= level * 10:
+	if xp >= level * xp_per_level:
 		xp = 0
 		level += 1
 		print("Level Up! ", level)
@@ -42,7 +49,7 @@ func explore():
 		print("Already exploring")
 		return
 		
-	if energy < 20:
+	if energy < exploration_energy_cost:
 		print("Too tired to explore")
 		return
 
@@ -53,14 +60,14 @@ func explore():
 	print("Creature left to explore")
 
 	var tween = create_tween()
-	tween.tween_property(self, "position", position + Vector2(300, 0), 1.0)
+	tween.tween_property(self, "position", position + Vector2(exploration_distance, 0), travel_duration)
 
 	await tween.finished
 
 	await get_tree().create_timer(exploration_duration).timeout
 
 	var return_tween = create_tween()
-	return_tween.tween_property(self, "position", home_position, 1.0)
+	return_tween.tween_property(self, "position", home_position, travel_duration)
 
 	await return_tween.finished
 	
@@ -87,9 +94,9 @@ func _process(delta):
 		stats_changed.emit()
 		
 func get_mood():
-	if energy >= 70:
+	if energy >= happy_energy_threshold:
 		return "Happy"
-	elif energy >= 30:
+	elif energy >= okay_energy_threshold:
 		return "Okay"
 	else:
 		return "Tired"
