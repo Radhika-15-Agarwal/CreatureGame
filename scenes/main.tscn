@@ -53,4 +53,11 @@ offset_right = 98.0
 offset_bottom = 153.0
 text = "State: Idle"
 
+[node name="EnergyLabel" type="Label" parent="CanvasLayer" unique_id=1443942606]
+offset_left = 20.0
+offset_top = 160.0
+offset_right = 143.0
+offset_bottom = 183.0
+text = "Energy: 100/100"
+
 [connection signal="pressed" from="CanvasLayer/ExploreButton" to="." method="_on_explore_button_pressed"]

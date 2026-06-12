@@ -2,6 +2,8 @@ extends CharacterBody2D
 
 var xp := 0
 var level := 1
+var energy := 100
+var max_energy := 100
 
 var exploring := false
 
@@ -23,8 +25,13 @@ func explore():
 	if exploring:
 		print("Already exploring")
 		return
+		
+	if energy < 20:
+		print("Too tired to explore")
+		return
 
 	exploring = true
+	energy -= 20
 	stats_changed.emit()
 
 	print("Creature left to explore")

@@ -5,6 +5,7 @@ extends Node2D
 @onready var level_label = $CanvasLayer/LevelLabel
 @onready var xp_label = $CanvasLayer/XPLabel
 @onready var state_label = $CanvasLayer/StateLabel
+@onready var energy_label = $CanvasLayer/EnergyLabel
 
 func _on_explore_button_pressed():
 	creature.explore()
@@ -21,3 +22,8 @@ func update_ui():
 		state_label.text = "State: Exploring"
 	else:
 		state_label.text = "State: Idle"
+		
+	energy_label.text = "Energy: %d/%d" % [
+		creature.energy,
+		creature.max_energy
+	]
