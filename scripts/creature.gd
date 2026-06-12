@@ -5,12 +5,12 @@ var level := 1
 var energy := 100.0
 var max_energy := 100.0
 
+var energy_cost := 20.0
+var energy_recovery_rate := 0.5
+
 var exploring := false
 
 var home_position : Vector2
-
-var energy_cost := 20.0
-var energy_recovery_rate := 0.5
 
 signal stats_changed
 
@@ -70,3 +70,11 @@ func _process(delta):
 		energy = min(energy, max_energy)
 
 		stats_changed.emit()
+		
+func get_mood():
+	if energy >= 70:
+		return "Happy"
+	elif energy >= 30:
+		return "Okay"
+	else:
+		return "Tired"
