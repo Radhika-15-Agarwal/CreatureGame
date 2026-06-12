@@ -7,6 +7,8 @@ var exploring := false
 
 var home_position : Vector2
 
+signal stats_changed
+
 func gain_xp(amount):
 	xp += amount
 
@@ -15,12 +17,15 @@ func gain_xp(amount):
 		level += 1
 		print("Level Up! ", level)
 
+	stats_changed.emit()
+
 func explore():
 	if exploring:
 		print("Already exploring")
 		return
 
 	exploring = true
+	stats_changed.emit()
 
 	print("Creature left to explore")
 
@@ -39,6 +44,7 @@ func explore():
 	gain_xp(5)
 
 	exploring = false
+	stats_changed.emit()
 
 	print("Creature returned")
 	
