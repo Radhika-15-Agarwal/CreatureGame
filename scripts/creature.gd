@@ -37,8 +37,8 @@ signal stats_changed
 func gain_xp(amount):
 	xp += amount
 
-	if xp >= level * xp_per_level:
-		xp = 0
+	while xp >= get_xp_threshold():
+		xp -= get_xp_threshold()
 		level += 1
 		print("Level Up! ", level)
 
@@ -111,3 +111,6 @@ func get_state():
 		
 func get_item_count(item_name: String):
 	return inventory.get(item_name, 0)
+	
+func get_xp_threshold():
+	return level * xp_per_level

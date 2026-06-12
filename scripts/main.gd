@@ -18,7 +18,10 @@ func _ready():
 	
 func update_ui():
 	level_label.text = "Level: %d" % creature.level
-	xp_label.text = "XP: %d" % creature.xp
+	xp_label.text = "XP: %d/%d" % [
+		creature.xp,
+		creature.get_xp_threshold()
+	]
 
 	state_label.text = "State: " + creature.get_state()
 		
