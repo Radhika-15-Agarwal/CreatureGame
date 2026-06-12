@@ -1,16 +1,29 @@
 extends CharacterBody2D
 
+# Progression
 var xp := 0
 var level := 1
+
+# Energy
 var energy := 100.0
 var max_energy := 100.0
-
-var energy_cost := 20.0
 var energy_recovery_rate := 0.5
+
+# Exploration
+var exploration_energy_cost := 20.0
+var exploration_xp_reward := 5
+var exploration_duration := 2.0
+
+# Rewards
+var berry_reward := 1
 
 var exploring := false
 
 var home_position : Vector2
+
+var inventory := {
+	"Berry": 0
+}
 
 signal stats_changed
 
@@ -34,7 +47,7 @@ func explore():
 		return
 
 	exploring = true
-	energy -= energy_cost
+	energy -= exploration_energy_cost
 	stats_changed.emit()
 
 	print("Creature left to explore")
@@ -44,14 +57,16 @@ func explore():
 
 	await tween.finished
 
-	await get_tree().create_timer(2.0).timeout
+	await get_tree().create_timer(exploration_duration).timeout
 
 	var return_tween = create_tween()
 	return_tween.tween_property(self, "position", home_position, 1.0)
 
 	await return_tween.finished
+	
+	inventory["Berry"] += berry_reward
 
-	gain_xp(5)
+	gain_xp(exploration_xp_reward)
 
 	exploring = false
 	stats_changed.emit()
@@ -86,3 +101,6 @@ func get_state():
 		return "Resting"
 	else:
 		return "Idle"
+		
+func get_item_count(item_name: String):
+	return inventory.get(item_name, 0)

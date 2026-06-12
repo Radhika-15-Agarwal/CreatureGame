@@ -67,4 +67,11 @@ offset_right = 60.0
 offset_bottom = 213.0
 text = "Mood: Happy"
 
+[node name="BerryLabel" type="Label" parent="CanvasLayer" unique_id=562186542]
+offset_left = 20.0
+offset_top = 220.0
+offset_right = 80.0
+offset_bottom = 243.0
+text = "Berry: 0"
+
 [connection signal="pressed" from="CanvasLayer/ExploreButton" to="." method="_on_explore_button_pressed"]
