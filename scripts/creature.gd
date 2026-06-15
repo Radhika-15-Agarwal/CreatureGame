@@ -33,11 +33,16 @@ var inventory := {
 }
 
 var experiences := {
-	"Forest": 0
+	"Forest": 0,
+	"Discovery": 0
 }
 
-var min_experience_reward := 1
-var max_experience_reward := 3
+# Experience Rewards
+var min_forest_exp_reward := 1
+var max_forest_exp_reward := 3
+
+var discovery_chance := 0.3
+var discovery_reward := 1
 
 var forest_preference_threshold := 10
 
@@ -89,10 +94,14 @@ func explore():
 	inventory["Berry"] += berry_reward
 	
 	var forest_exp_reward = randi_range(
-		min_experience_reward,
-		max_experience_reward
+		min_forest_exp_reward,
+		max_forest_exp_reward
 	)
 	gain_experience("Forest", forest_exp_reward)
+	
+	if randf() < discovery_chance:
+		gain_experience("Discovery", discovery_reward)
+		print("Discovered something new!")
 
 	if get_affinity("Nature") > 0:
 		var bonus_chance = get_affinity("Nature") * nature_affinity_exp_bonus_chance

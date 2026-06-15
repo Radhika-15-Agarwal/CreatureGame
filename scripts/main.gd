@@ -11,6 +11,7 @@ extends Node2D
 @onready var forest_exp_label = $CanvasLayer/ForestExpLabel
 @onready var preference_label = $CanvasLayer/PreferenceLabel
 @onready var nature_affinity_label = $CanvasLayer/NatureAffinityLabel
+@onready var discovery_exp_label = $CanvasLayer/DiscoveryExpLabel
 
 func _on_explore_button_pressed():
 	creature.explore()
@@ -35,6 +36,7 @@ func update_ui():
 	mood_label.text = "Mood: " + creature.get_mood()
 	berry_label.text = "Berries: %d" % creature.get_item_count("Berry")
 	forest_exp_label.text = "Forest Exp: %d" % creature.get_experience("Forest")
+	discovery_exp_label.text = "Discovery Exp: %d" % creature.get_experience("Discovery")
 	
 	preference_label.text = "Preference: " + creature.get_preference()
 	nature_affinity_label.text = "Nature Affinity: %d" % creature.get_affinity("Nature")

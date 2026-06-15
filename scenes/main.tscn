@@ -95,4 +95,11 @@ offset_right = 153.0
 offset_bottom = 333.0
 text = "Nature Affinity: 0"
 
+[node name="DiscoveryExpLabel" type="Label" parent="CanvasLayer" unique_id=997877569]
+offset_left = 20.0
+offset_top = 340.0
+offset_right = 145.0
+offset_bottom = 363.0
+text = "Discovery Exp: 0"
+
 [connection signal="pressed" from="CanvasLayer/ExploreButton" to="." method="_on_explore_button_pressed"]
