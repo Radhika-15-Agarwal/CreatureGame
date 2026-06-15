@@ -39,6 +39,8 @@ var experiences := {
 var min_experience_reward := 1
 var max_experience_reward := 3
 
+var forest_preference_threshold := 10
+
 signal stats_changed
 
 func gain_xp(amount):
@@ -137,3 +139,9 @@ func gain_experience(experience_type: String, amount: int):
 
 func get_experience(experience_type: String):
 	return experiences.get(experience_type, 0)
+	
+func get_preference():
+	if get_experience("Forest") >= forest_preference_threshold:
+		return "Likes Forests"
+
+	return "Undecided"
