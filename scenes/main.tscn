@@ -88,4 +88,11 @@ offset_right = 60.0
 offset_bottom = 303.0
 text = "Preference: Undecided"
 
+[node name="NatureAffinityLabel" type="Label" parent="CanvasLayer" unique_id=1052474471]
+offset_left = 20.0
+offset_top = 310.0
+offset_right = 153.0
+offset_bottom = 333.0
+text = "Nature Affinity: 0"
+
 [connection signal="pressed" from="CanvasLayer/ExploreButton" to="." method="_on_explore_button_pressed"]

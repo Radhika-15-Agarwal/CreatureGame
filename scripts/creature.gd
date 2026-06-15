@@ -41,6 +41,10 @@ var max_experience_reward := 3
 
 var forest_preference_threshold := 10
 
+var affinities := {
+	"Nature": 0
+}
+
 signal stats_changed
 
 func gain_xp(amount):
@@ -89,6 +93,10 @@ func explore():
 	gain_experience("Forest", forest_exp_reward)
 
 	gain_xp(exploration_xp_reward)
+	
+	if get_preference() == "Likes Forests":
+		if randf() < 0.25:
+			gain_affinity("Nature", 1)
 
 	exploring = false
 	stats_changed.emit()
@@ -145,3 +153,14 @@ func get_preference():
 		return "Likes Forests"
 
 	return "Undecided"
+	
+func gain_affinity(affinity_type: String, amount: int):
+	if not affinities.has(affinity_type):
+		affinities[affinity_type] = 0
+
+	affinities[affinity_type] += amount
+
+	stats_changed.emit()
+
+func get_affinity(affinity_type: String):
+	return affinities.get(affinity_type, 0)
