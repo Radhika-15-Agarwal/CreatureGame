@@ -8,6 +8,7 @@ extends Node2D
 @onready var energy_label = $CanvasLayer/EnergyLabel
 @onready var mood_label = $CanvasLayer/MoodLabel
 @onready var berry_label = $CanvasLayer/BerryLabel
+@onready var forest_exp_label = $CanvasLayer/ForestExpLabel
 
 func _on_explore_button_pressed():
 	creature.explore()
@@ -31,3 +32,4 @@ func update_ui():
 	]
 	mood_label.text = "Mood: " + creature.get_mood()
 	berry_label.text = "Berries: %d" % creature.get_item_count("Berry")
+	forest_exp_label.text = "Forest Exp: %d" % creature.get_experience("Forest")

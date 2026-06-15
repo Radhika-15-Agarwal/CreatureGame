@@ -32,6 +32,13 @@ var inventory := {
 	"Berry": 0
 }
 
+var experiences := {
+	"Forest": 0
+}
+
+var min_experience_reward := 1
+var max_experience_reward := 3
+
 signal stats_changed
 
 func gain_xp(amount):
@@ -72,6 +79,12 @@ func explore():
 	await return_tween.finished
 	
 	inventory["Berry"] += berry_reward
+	
+	var forest_exp_reward = randi_range(
+		min_experience_reward,
+		max_experience_reward
+	)
+	gain_experience("Forest", forest_exp_reward)
 
 	gain_xp(exploration_xp_reward)
 
@@ -114,3 +127,13 @@ func get_item_count(item_name: String):
 	
 func get_xp_threshold():
 	return level * xp_per_level
+	
+func gain_experience(experience_type: String, amount: int):
+	if not experiences.has(experience_type):
+		experiences[experience_type] = 0
+
+	experiences[experience_type] += amount
+	stats_changed.emit()
+
+func get_experience(experience_type: String):
+	return experiences.get(experience_type, 0)
