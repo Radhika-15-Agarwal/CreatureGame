@@ -44,6 +44,8 @@ var forest_preference_threshold := 10
 var affinities := {
 	"Nature": 0
 }
+var nature_affinity_exp_bonus_chance := 0.1
+var max_bonus_chance := 0.5
 
 signal stats_changed
 
@@ -91,6 +93,13 @@ func explore():
 		max_experience_reward
 	)
 	gain_experience("Forest", forest_exp_reward)
+
+	if get_affinity("Nature") > 0:
+		var bonus_chance = get_affinity("Nature") * nature_affinity_exp_bonus_chance
+		bonus_chance = min(bonus_chance, max_bonus_chance)
+		if randf() < bonus_chance:
+			gain_experience("Forest", 1)
+			print("Nature affinity bonus!")
 
 	gain_xp(exploration_xp_reward)
 	
