@@ -59,6 +59,9 @@ var tendencies := {
 var curiosity_gain_chance := 0.5
 var curiosity_trait_threshold := 10
 
+# Traits
+var curious_discovery_bonus_chance := 0.1
+
 signal stats_changed
 
 func gain_xp(amount):
@@ -106,12 +109,17 @@ func explore():
 	)
 	gain_experience("Forest", forest_exp_reward)
 	
-	if randf() < discovery_chance:
+	var final_discovery_chance = discovery_chance
+
+	if has_trait("Curious"):
+		final_discovery_chance += curious_discovery_bonus_chance
+
+	if randf() < final_discovery_chance:
 		gain_experience("Discovery", discovery_reward)
-		
+
 		if randf() < curiosity_gain_chance:
 			gain_tendency("Curiosity", 1)
-		
+
 		print("Discovered something new!")
 
 	if get_affinity("Nature") > 0:
