@@ -52,6 +52,13 @@ var affinities := {
 var nature_affinity_exp_bonus_chance := 0.1
 var max_bonus_chance := 0.5
 
+var tendencies := {
+	"Curiosity": 0
+}
+# Tendencies
+var curiosity_gain_chance := 0.5
+var curiosity_trait_threshold := 10
+
 signal stats_changed
 
 func gain_xp(amount):
@@ -101,6 +108,10 @@ func explore():
 	
 	if randf() < discovery_chance:
 		gain_experience("Discovery", discovery_reward)
+		
+		if randf() < curiosity_gain_chance:
+			gain_tendency("Curiosity", 1)
+		
 		print("Discovered something new!")
 
 	if get_affinity("Nature") > 0:
@@ -182,3 +193,27 @@ func gain_affinity(affinity_type: String, amount: int):
 
 func get_affinity(affinity_type: String):
 	return affinities.get(affinity_type, 0)
+	
+func gain_tendency(tendency_type: String, amount: int):
+	if not tendencies.has(tendency_type):
+		tendencies[tendency_type] = 0
+
+	tendencies[tendency_type] += amount
+
+	stats_changed.emit()
+
+func get_tendency(tendency_type: String):
+	return tendencies.get(tendency_type, 0)
+	
+func has_trait(trait_name: String):
+	match trait_name:
+		"Curious":
+			return get_tendency("Curiosity") >= curiosity_trait_threshold
+
+	return false
+	
+func get_trait_text():
+	if has_trait("Curious"):
+		return "Curious"
+
+	return "None"
