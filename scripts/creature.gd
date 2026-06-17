@@ -34,7 +34,8 @@ var inventory := {
 
 var experiences := {
 	"Forest": 0,
-	"Discovery": 0
+	"Discovery": 0,
+	"Danger": 0
 }
 
 # Experience Rewards
@@ -43,6 +44,9 @@ var max_forest_exp_reward := 3
 
 var discovery_chance := 0.3
 var discovery_reward := 1
+
+var danger_chance := 0.2
+var danger_reward := 1
 
 var forest_preference_threshold := 10
 
@@ -121,6 +125,10 @@ func explore():
 			gain_tendency("Curiosity", 1)
 
 		print("Discovered something new!")
+		
+	if randf() < danger_chance:
+		gain_experience("Danger", danger_reward)
+		print("Danger encountered!")
 
 	if get_affinity("Nature") > 0:
 		var bonus_chance = get_affinity("Nature") * nature_affinity_exp_bonus_chance
