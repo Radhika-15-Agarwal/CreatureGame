@@ -212,8 +212,18 @@ func has_trait(trait_name: String):
 
 	return false
 	
-func get_trait_text():
-	if has_trait("Curious"):
-		return "Curious"
+func get_traits():
+	var traits = []
 
-	return "None"
+	if has_trait("Curious"):
+		traits.append("Curious")
+
+	return traits
+	
+func get_trait_text():
+	var traits = get_traits()
+
+	if traits.is_empty():
+		return "None"
+
+	return ", ".join(traits)
