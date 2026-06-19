@@ -55,6 +55,15 @@ var location_data := {
 		"affinity_gain_chance": 0.35,
 		"discovery_chance": 0.2,
 		"danger_chance": 0.4
+	},
+	"Cave": {
+		"affinity": "Earth",
+		"min_exp": 1,
+		"max_exp": 4,
+		"affinity_bonus": 0.15,
+		"affinity_gain_chance": 0.30,
+		"discovery_chance": 0.15,
+		"danger_chance": 0.35
 	}
 }
 var current_location := "Forest"
@@ -190,7 +199,9 @@ func _ready():
 		
 		if not experiences.has(location):
 			experiences[location] = 0
-			
+	
+	print(experiences)
+	print(affinities)
 	
 func _process(delta):
 	if exploring:

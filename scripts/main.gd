@@ -19,6 +19,8 @@ extends Node2D
 @onready var volcano_exp_label = $CanvasLayer/VolcanoExpLabel
 @onready var fire_affinity_label = $CanvasLayer/FireAffinityLabel
 @onready var location_label = $CanvasLayer/LocationLabel
+@onready var cave_exp_label = $CanvasLayer/CaveExpLabel
+@onready var earth_affinity_label = $CanvasLayer/EarthAffinityLabel
 
 func _on_explore_button_pressed():
 	creature.explore()
@@ -58,3 +60,6 @@ func update_ui():
 	danger_exp_label.text = "Danger Exp: %d" % creature.get_experience("Danger")
 	bravery_label.text = "Bravery: %d" % creature.get_tendency("Bravery")
 	location_label.text = "Location: " + creature.get_location()
+	
+	cave_exp_label.text = "Cave Exp: %d" % creature.get_experience("Cave")
+	earth_affinity_label.text = "Earth Affinity: %d" % creature.get_affinity("Earth")

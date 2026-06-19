@@ -158,5 +158,19 @@ offset_right = 230.0
 offset_bottom = 51.0
 text = "Switch Location"
 
+[node name="CaveExpLabel" type="Label" parent="CanvasLayer" unique_id=909234804]
+offset_left = 20.0
+offset_top = 580.0
+offset_right = 131.0
+offset_bottom = 603.0
+text = "Cave Exp: 0"
+
+[node name="EarthAffinityLabel" type="Label" parent="CanvasLayer" unique_id=398958348]
+offset_left = 20.0
+offset_top = 610.0
+offset_right = 153.0
+offset_bottom = 633.0
+text = "Earth Affinity: 0"
+
 [connection signal="pressed" from="CanvasLayer/ExploreButton" to="." method="_on_explore_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/LocationButton" to="." method="_on_location_button_pressed"]
