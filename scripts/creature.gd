@@ -21,16 +21,11 @@ var exploration_duration := 2.0
 var exploration_distance := 300.0
 var travel_duration := 1.0
 
-# Rewards
-var berry_reward := 1
-
 var exploring := false
 
 var home_position : Vector2
 
-var inventory := {
-	"Berry": 0
-}
+var inventory := {}
 
 var experiences := {
 	"Discovery": 0,
@@ -45,7 +40,10 @@ var location_data := {
 		"affinity_bonus": 0.1,
 		"affinity_gain_chance": 0.25,
 		"discovery_chance": 0.3,
-		"danger_chance": 0.2
+		"danger_chance": 0.2,
+		"item": "Berry",
+		"min_item": 1,
+		"max_item": 3
 	},
 	"Volcano": {
 		"affinity": "Fire",
@@ -54,7 +52,10 @@ var location_data := {
 		"affinity_bonus": 0.1,
 		"affinity_gain_chance": 0.35,
 		"discovery_chance": 0.2,
-		"danger_chance": 0.4
+		"danger_chance": 0.4,
+		"item": "Ember Stone",
+		"min_item": 1,
+		"max_item": 2
 	},
 	"Cave": {
 		"affinity": "Earth",
@@ -63,7 +64,10 @@ var location_data := {
 		"affinity_bonus": 0.15,
 		"affinity_gain_chance": 0.30,
 		"discovery_chance": 0.15,
-		"danger_chance": 0.35
+		"danger_chance": 0.35,
+		"item": "Crystal",
+		"min_item": 1,
+		"max_item": 4
 	}
 }
 var current_location := "Forest"
@@ -132,15 +136,19 @@ func explore():
 
 	await return_tween.finished
 	
-	inventory["Berry"] += berry_reward
+	var location_info = get_location_data()
 	
-	var reward_data = get_location_data()
-
-	var location_exp_reward = randi_range(
-		reward_data["min_exp"],
-		reward_data["max_exp"]
+	var item_amount = randi_range(
+		location_info["min_item"],
+		location_info["max_item"]
 	)
-	gain_experience(current_location, location_exp_reward)
+	inventory[get_location_item()] += item_amount
+
+	var location_exp_gain = randi_range(
+		location_info["min_exp"],
+		location_info["max_exp"]
+	)
+	gain_experience(current_location, location_exp_gain)
 	
 	var final_discovery_chance = get_location_discovery_chance()
 
@@ -187,21 +195,28 @@ func explore():
 	stats_changed.emit()
 
 	print("Creature returned")
+	print("Found ", item_amount, " ", get_location_item())
 	
 func _ready():
 	home_position = position
 
 	for location in location_data:
+		if not experiences.has(location):
+			experiences[location] = 0
+			
 		var affinity = location_data[location]["affinity"]
 
 		if not affinities.has(affinity):
 			affinities[affinity] = 0
 		
-		if not experiences.has(location):
-			experiences[location] = 0
+		var item = location_data[location]["item"]
+
+		if not inventory.has(item):
+			inventory[item] = 0
 	
 	print(experiences)
 	print(affinities)
+	print(inventory)
 	
 func _process(delta):
 	if exploring:
@@ -348,3 +363,6 @@ func get_location_danger_chance():
 	
 func get_location_affinity_gain_chance():
 	return get_location_data()["affinity_gain_chance"]
+	
+func get_location_item():
+	return get_location_data()["item"]
