@@ -27,10 +27,7 @@ var home_position : Vector2
 
 var inventory := {}
 
-var experiences := {
-	"Discovery": 0,
-	"Danger": 0
-}
+var experiences := {}
 
 var location_data := {
 	"Forest": {
@@ -75,25 +72,49 @@ var max_bonus_chance := 0.5
 
 var affinities := {}
 
-
-var discovery_reward := 1
-var danger_reward := 1
-
 var preference_threshold := 10
 
-var tendencies := {
-	"Curiosity": 0,
-	"Bravery": 0,
+var trait_data := {
+	"Curious": {
+		"tendency": "Curiosity",
+		"threshold": 10,
+		"comparison": ">="
+	},
+	"Brave": {
+		"tendency": "Bravery",
+		"threshold": 10,
+		"comparison": ">="
+	},
+	"Timid": {
+		"tendency": "Bravery",
+		"threshold": -10,
+		"comparison": "<="
+	}
 }
-# Tendencies
-var curiosity_gain_chance := 0.5
-var curiosity_trait_threshold := 10
-var bravery_chance := 0.5
-var bravery_gain_chance := 0.5
-var brave_trait_threshold := 10
-var timid_trait_threshold := -10
 
-var TRAITS := ["Curious", "Brave", "Timid"]
+var tendencies := {}
+
+var tendency_data := {
+	"Curiosity": {
+		"gain_chance": 0.5
+	},
+	"Bravery": {
+		"event_chance": 0.5,
+		"gain_chance": 0.5
+	}
+}
+
+var event_data := {
+	"Discovery": {
+		"reward": 1
+	},
+	"Danger": {
+		"reward": 1
+	}
+}
+
+var events := {}
+
 # Traits
 var curious_discovery_bonus_chance := 0.1
 
@@ -158,18 +179,18 @@ func explore():
 	final_discovery_chance = min(final_discovery_chance, 1.0)
 	
 	if randf() < final_discovery_chance:
-		gain_experience("Discovery", discovery_reward)
+		gain_event("Discovery", event_data["Discovery"]["reward"])
 
-		if randf() < curiosity_gain_chance:
+		if randf() < tendency_data["Curiosity"]["gain_chance"]:
 			gain_tendency("Curiosity", 1)
 
 		print("Discovered something new!")
 		
 	if randf() < get_location_danger_chance():
-		gain_experience("Danger", danger_reward)
+		gain_event("Danger", event_data["Danger"]["reward"])
 
-		if randf() < bravery_chance:
-			if randf() < bravery_gain_chance:
+		if randf() < tendency_data["Bravery"]["event_chance"]:
+			if randf() < tendency_data["Bravery"]["gain_chance"]:
 				gain_tendency("Bravery", 1)
 			else:
 				gain_tendency("Bravery", -1)
@@ -213,10 +234,18 @@ func _ready():
 
 		if not inventory.has(item):
 			inventory[item] = 0
+			
+	for tendency in tendency_data:
+		tendencies[tendency] = 0
+		
+	for event_type in event_data:
+		events[event_type] = 0
 	
 	print(experiences)
 	print(affinities)
 	print(inventory)
+	print(events)
+	print(tendencies)
 	
 func _process(delta):
 	if exploring:
@@ -259,6 +288,16 @@ func gain_experience(experience_type: String, amount: int):
 
 func get_experience(experience_type: String):
 	return experiences.get(experience_type, 0)
+	
+func gain_event(event_type: String, amount: int):
+	if not events.has(event_type):
+		events[event_type] = 0
+
+	events[event_type] += amount
+	stats_changed.emit()
+
+func get_event(event_type: String):
+	return events.get(event_type, 0)
 	
 func get_preference():
 	var favorite_location = ""
@@ -305,22 +344,24 @@ func get_tendency(tendency_type: String):
 	return tendencies.get(tendency_type, 0)
 	
 func has_trait(trait_name: String):
-	match trait_name:
-		"Curious":
-			return get_tendency("Curiosity") >= curiosity_trait_threshold
+	if not trait_data.has(trait_name):
+		return false
 
-		"Brave":
-			return get_tendency("Bravery") >= brave_trait_threshold
+	var data = trait_data[trait_name]
+	var tendency_value = get_tendency(data["tendency"])
 
-		"Timid":
-			return get_tendency("Bravery") <= timid_trait_threshold
+	match data["comparison"]:
+		">=":
+			return tendency_value >= data["threshold"]
+		"<=":
+			return tendency_value <= data["threshold"]
 
 	return false
 	
 func get_traits():
 	var traits = []
 
-	for trait_name in TRAITS:
+	for trait_name in trait_data:
 		if has_trait(trait_name):
 			traits.append(trait_name)
 
