@@ -15,9 +15,16 @@ extends Node2D
 @onready var curiosity_label = $CanvasLayer/CuriosityLabel
 @onready var trait_label = $CanvasLayer/TraitLabel
 @onready var danger_exp_label = $CanvasLayer/DangerExpLabel
+@onready var bravery_label = $CanvasLayer/BraveryLabel
+@onready var volcano_exp_label = $CanvasLayer/VolcanoExpLabel
+@onready var fire_affinity_label = $CanvasLayer/FireAffinityLabel
+@onready var location_label = $CanvasLayer/LocationLabel
 
 func _on_explore_button_pressed():
 	creature.explore()
+	
+func _on_location_button_pressed():
+	creature.switch_location()
 	
 func _ready():
 	creature.stats_changed.connect(update_ui)
@@ -39,11 +46,15 @@ func update_ui():
 	mood_label.text = "Mood: " + creature.get_mood()
 	berry_label.text = "Berries: %d" % creature.get_item_count("Berry")
 	forest_exp_label.text = "Forest Exp: %d" % creature.get_experience("Forest")
+	volcano_exp_label.text = "Volcano Exp: %d" % creature.get_experience("Volcano")
 	discovery_exp_label.text = "Discovery Exp: %d" % creature.get_experience("Discovery")
 	
 	preference_label.text = "Preference: " + creature.get_preference()
 	nature_affinity_label.text = "Nature Affinity: %d" % creature.get_affinity("Nature")
+	fire_affinity_label.text = "Fire Affinity: %d" % creature.get_affinity("Fire")
 	curiosity_label.text = "Curiosity: %d" % creature.get_tendency("Curiosity")
 	trait_label.text = "Trait: " + creature.get_trait_text()
 	
 	danger_exp_label.text = "Danger Exp: %d" % creature.get_experience("Danger")
+	bravery_label.text = "Bravery: %d" % creature.get_tendency("Bravery")
+	location_label.text = "Location: " + creature.get_location()
