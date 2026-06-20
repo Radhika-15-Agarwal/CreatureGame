@@ -407,3 +407,26 @@ func get_location_affinity_gain_chance():
 	
 func get_location_item():
 	return get_location_data()["item"]
+	
+func use_item(item_name: String):
+	if get_item_count(item_name) <= 0:
+		return
+
+	inventory[item_name] -= 1
+
+	match item_name:
+		"Berry":
+			if energy >= max_energy:
+				inventory["Berry"] += 1
+				print("Energy Full!")
+				return
+			energy += 10
+			energy = min(energy, max_energy)
+
+		"Ember Stone":
+			gain_affinity("Fire", 1)
+
+		"Crystal":
+			gain_affinity("Earth", 1)
+
+	stats_changed.emit()

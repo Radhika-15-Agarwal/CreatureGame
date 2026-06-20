@@ -63,3 +63,15 @@ func update_ui():
 	
 	cave_exp_label.text = "Cave Exp: %d" % creature.get_experience("Cave")
 	earth_affinity_label.text = "Earth Affinity: %d" % creature.get_affinity("Earth")
+
+
+func _on_use_berry_button_pressed() -> void:
+	creature.use_item("Berry")
+
+
+func _on_use_ember_stone_button_pressed() -> void:
+	creature.use_item("Ember Stone")
+
+
+func _on_use_crystal_button_pressed() -> void:
+	creature.use_item("Crystal")

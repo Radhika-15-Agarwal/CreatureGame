@@ -172,5 +172,43 @@ offset_right = 153.0
 offset_bottom = 633.0
 text = "Earth Affinity: 0"
 
+[node name="CrystalLabel" type="Label" parent="CanvasLayer" unique_id=1283610201]
+offset_left = 20.0
+offset_top = 640.0
+offset_right = 60.0
+offset_bottom = 663.0
+text = "Crystal: 0"
+
+[node name="EmberStoneLabel" type="Label" parent="CanvasLayer" unique_id=732455951]
+offset_left = 20.0
+offset_top = 670.0
+offset_right = 60.0
+offset_bottom = 693.0
+text = "Ember Stone: 0"
+
+[node name="UseBerryButton" type="Button" parent="CanvasLayer" unique_id=1178855698]
+offset_left = 300.0
+offset_top = 20.0
+offset_right = 384.0
+offset_bottom = 51.0
+text = "Use Berry"
+
+[node name="UseEmberStoneButton" type="Button" parent="CanvasLayer" unique_id=1299315584]
+offset_left = 400.0
+offset_top = 20.0
+offset_right = 540.0
+offset_bottom = 51.0
+text = "Use Ember Stone"
+
+[node name="UseCrystalButton" type="Button" parent="CanvasLayer" unique_id=1503624767]
+offset_left = 560.0
+offset_top = 20.0
+offset_right = 655.0
+offset_bottom = 51.0
+text = "Use Crystal"
+
 [connection signal="pressed" from="CanvasLayer/ExploreButton" to="." method="_on_explore_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/LocationButton" to="." method="_on_location_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UseBerryButton" to="." method="_on_use_berry_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UseEmberStoneButton" to="." method="_on_use_ember_stone_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UseCrystalButton" to="." method="_on_use_crystal_button_pressed"]
