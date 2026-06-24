@@ -207,31 +207,18 @@ func gain_xp(amount):
 	stats_changed.emit()
 
 func explore():
-	if exploring:
-		print("Already exploring")
-		return
-		
-	if energy < exploration_energy_cost:
-		print("Too tired to explore")
+	
+	if not can_explore():
 		return
 
-	exploring = true
-	energy -= exploration_energy_cost
-	stats_changed.emit()
+	start_exploration()
 
-	print("Creature left to explore")
+	await travel_to_exploration()
 
-	var tween = create_tween()
-	tween.tween_property(self, "position", position + Vector2(exploration_distance, 0), travel_duration)
+	await explore_location()
 
-	await tween.finished
+	await return_home()
 
-	await get_tree().create_timer(exploration_duration).timeout
-
-	var return_tween = create_tween()
-	return_tween.tween_property(self, "position", home_position, travel_duration)
-
-	await return_tween.finished
 	
 	var location_info = get_location_data()
 	
@@ -306,10 +293,8 @@ func explore():
 		if randf() < get_location_affinity_gain_chance():
 			gain_affinity(location_affinity, 1)
 
-	exploring = false
-	stats_changed.emit()
 
-	print("Creature returned")
+	finish_exploration()
 	print("Found ", item_amount, " ", get_location_item())
 	
 func _ready():
@@ -539,3 +524,44 @@ func get_affinity_xp_modifier():
 			modifier -= affinity_level * 0.01
 
 	return modifier
+	
+
+func can_explore():
+	if exploring:
+		print("Already exploring")
+		return false
+
+	if energy < exploration_energy_cost:
+		print("Too tired to explore")
+		return false
+
+	return true
+	
+func start_exploration():
+	exploring = true
+	energy -= exploration_energy_cost
+	stats_changed.emit()
+
+	print("Creature left to explore")
+	
+func travel_to_exploration():
+	var tween = create_tween()
+	tween.tween_property(self, "position", position + Vector2(exploration_distance, 0), travel_duration)
+
+	await tween.finished
+	
+func explore_location():
+	await get_tree().create_timer(exploration_duration).timeout
+	
+func return_home():
+	var return_tween = create_tween()
+	return_tween.tween_property(self, "position", home_position, travel_duration)
+
+	await return_tween.finished
+	
+func finish_exploration():
+	exploring = false
+	stats_changed.emit()
+
+	print("Creature returned")
+	
