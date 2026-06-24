@@ -222,80 +222,22 @@ func explore():
 	
 	var location_info = get_location_data()
 	
-	var item_amount = randi_range(
-		location_info["min_item"],
-		location_info["max_item"]
-	)
-	inventory[get_location_item()] += item_amount
-
-	var location_exp_gain = randi_range(
-		location_info["min_exp"],
-		location_info["max_exp"]
-	)
-	var modifier = get_affinity_xp_modifier()
-
-	location_exp_gain = round(
-		location_exp_gain * (1.0 + modifier)
-	)
-
-	location_exp_gain = max(location_exp_gain, 1)
-	gain_experience(current_location, location_exp_gain)
+	var item_amount = collect_items(location_info)
+	print("Found ", item_amount, " ", get_location_item())
 	
-	var final_discovery_chance = get_location_discovery_chance()
-	var final_danger_chance = get_location_danger_chance()
-
-	if has_trait("Curious"):
-		final_discovery_chance += curious_discovery_bonus_chance
-		final_danger_chance += curious_danger_bonus_chance
-		
-	if has_trait("Brave"):
-		final_danger_chance += brave_danger_bonus_chance
-		location_exp_gain += 1
-
-	if has_trait("Timid"):
-		final_danger_chance -= timid_danger_reduction
-		final_discovery_chance -= timid_discovery_penalty
-
-	final_discovery_chance = clamp(final_discovery_chance, 0.0, 1.0)
-	final_danger_chance = clamp(final_danger_chance, 0.0, 1.0)
+	var location_exp_gain = process_location_experience(location_info)
 	
-	if randf() < final_discovery_chance:
-		gain_event("Discovery", event_data["Discovery"]["reward"])
-
-		if randf() < tendency_data["Curiosity"]["gain_chance"]:
-			gain_tendency("Curiosity", 1)
-
-		print("Discovered something new!")
-		
-	if randf() < final_danger_chance:
-		gain_event("Danger", event_data["Danger"]["reward"])
-
-		if randf() < tendency_data["Bravery"]["event_chance"]:
-			if randf() < tendency_data["Bravery"]["gain_chance"]:
-				gain_tendency("Bravery", 1)
-			else:
-				gain_tendency("Bravery", -1)
-
-		print("Danger encountered!")
+	process_events(location_exp_gain)
 		
 	var location_affinity = get_location_affinity()
-
-	if get_affinity(location_affinity) > 0:
-		var bonus_chance = get_affinity(location_affinity) * get_location_affinity_bonus()
-		bonus_chance = min(bonus_chance, max_bonus_chance)
-		if randf() < bonus_chance:
-			gain_experience(current_location, 1)
-			print(location_affinity," affinity bonus!")
+	
+	process_affinity_bonus(location_affinity)
+	process_affinity_growth(location_affinity)
 
 	gain_xp(exploration_xp_reward)
-	
-	if get_preference() == current_location:
-		if randf() < get_location_affinity_gain_chance():
-			gain_affinity(location_affinity, 1)
-
 
 	finish_exploration()
-	print("Found ", item_amount, " ", get_location_item())
+
 	
 func _ready():
 	home_position = position
@@ -564,4 +506,85 @@ func finish_exploration():
 	stats_changed.emit()
 
 	print("Creature returned")
+
+
+
+func collect_items(location_info: Dictionary):
+	
+	var item_amount = randi_range(
+		location_info["min_item"],
+		location_info["max_item"]
+	)
+	inventory[get_location_item()] += item_amount
+	
+	return item_amount
+
+func process_location_experience(location_info: Dictionary):
+	var location_exp_gain = randi_range(
+		location_info["min_exp"],
+		location_info["max_exp"]
+	)
+
+	var modifier = get_affinity_xp_modifier()
+
+	location_exp_gain = round(location_exp_gain * (1.0 + modifier))
+
+	location_exp_gain = max(location_exp_gain, 1)
+
+	gain_experience(current_location, location_exp_gain)
+
+	return location_exp_gain
+
+func process_events(location_exp_gain: int):
+	var final_discovery_chance = get_location_discovery_chance()
+	var final_danger_chance = get_location_danger_chance()
+
+	if has_trait("Curious"):
+		final_discovery_chance += curious_discovery_bonus_chance
+		final_danger_chance += curious_danger_bonus_chance
+		
+	if has_trait("Brave"):
+		final_danger_chance += brave_danger_bonus_chance
+		location_exp_gain += 1
+
+	if has_trait("Timid"):
+		final_danger_chance -= timid_danger_reduction
+		final_discovery_chance -= timid_discovery_penalty
+
+	final_discovery_chance = clamp(final_discovery_chance, 0.0, 1.0)
+	final_danger_chance = clamp(final_danger_chance, 0.0, 1.0)
+	
+	if randf() < final_discovery_chance:
+		gain_event("Discovery", event_data["Discovery"]["reward"])
+
+		if randf() < tendency_data["Curiosity"]["gain_chance"]:
+			gain_tendency("Curiosity", 1)
+
+		print("Discovered something new!")
+		
+	if randf() < final_danger_chance:
+		gain_event("Danger", event_data["Danger"]["reward"])
+
+		if randf() < tendency_data["Bravery"]["event_chance"]:
+			if randf() < tendency_data["Bravery"]["gain_chance"]:
+				gain_tendency("Bravery", 1)
+			else:
+				gain_tendency("Bravery", -1)
+
+		print("Danger encountered!")
+
+func process_affinity_bonus(location_affinity):
+
+	if get_affinity(location_affinity) > 0:
+		var bonus_chance = get_affinity(location_affinity) * get_location_affinity_bonus()
+		bonus_chance = min(bonus_chance, max_bonus_chance)
+
+		if randf() < bonus_chance:
+			gain_experience(current_location, 1)
+			print(location_affinity, " affinity bonus!")
+
+func process_affinity_growth(location_affinity):
+	if get_preference() == current_location:
+		if randf() < get_location_affinity_gain_chance():
+			gain_affinity(location_affinity, 1)
 	
