@@ -117,6 +117,82 @@ var events := {}
 
 # Traits
 var curious_discovery_bonus_chance := 0.1
+var curious_danger_bonus_chance := 0.1
+var brave_danger_bonus_chance := 0.1
+var timid_danger_reduction := 0.1
+var timid_discovery_penalty := 0.1
+
+var domain_data := {
+	"Nature": {
+		"strong_against": ["Water", "Light"],
+		"weak_against": ["Fire", "Ice"],
+		"likes": ["Nature", "Water", "Light"],
+		"dislikes": ["Fire", "Metal"]
+	},
+
+	"Fire": {
+		"strong_against": ["Ice", "Nature"],
+		"weak_against": ["Water", "Earth"],
+		"likes": ["Fire", "Light", "Electric"],
+		"dislikes": ["Water", "Ice"]
+	},
+
+	"Earth": {
+		"strong_against": ["Electric", "Fire"],
+		"weak_against": ["Air", "Metal"],
+		"likes": ["Earth", "Metal", "Nature"],
+		"dislikes": ["Air"]
+	},
+
+	"Water": {
+		"strong_against": ["Fire", "Light"],
+		"weak_against": ["Nature", "Dark"],
+		"likes": ["Water", "Nature", "Ice"],
+		"dislikes": ["Electric"]
+	},
+
+	"Air": {
+		"strong_against": ["Earth", "Metal"],
+		"weak_against": ["Light", "Dark"],
+		"likes": ["Air", "Light", "Electric"],
+		"dislikes": ["Earth"]
+	},
+
+	"Ice": {
+		"strong_against": ["Nature", "Electric"],
+		"weak_against": ["Fire", "Metal"],
+		"likes": ["Ice", "Water", "Dark"],
+		"dislikes": ["Fire"]
+	},
+
+	"Electric": {
+		"strong_against": ["Metal", "Dark"],
+		"weak_against": ["Earth", "Ice"],
+		"likes": ["Electric", "Air", "Fire"],
+		"dislikes": ["Earth", "Water"]
+	},
+
+	"Metal": {
+		"strong_against": ["Ice", "Earth"],
+		"weak_against": ["Electric", "Air"],
+		"likes": ["Metal", "Earth", "Electric"],
+		"dislikes": ["Nature"]
+	},
+
+	"Light": {
+		"strong_against": ["Dark", "Air"],
+		"weak_against": ["Nature", "Water"],
+		"likes": ["Light", "Nature", "Fire"],
+		"dislikes": ["Dark"]
+	},
+
+	"Dark": {
+		"strong_against": ["Air", "Water"],
+		"weak_against": ["Light", "Electric"],
+		"likes": ["Dark", "Ice", "Metal"],
+		"dislikes": ["Light"]
+	}
+}
 
 signal stats_changed
 
@@ -169,14 +245,32 @@ func explore():
 		location_info["min_exp"],
 		location_info["max_exp"]
 	)
+	var modifier = get_affinity_xp_modifier()
+
+	location_exp_gain = round(
+		location_exp_gain * (1.0 + modifier)
+	)
+
+	location_exp_gain = max(location_exp_gain, 1)
 	gain_experience(current_location, location_exp_gain)
 	
 	var final_discovery_chance = get_location_discovery_chance()
+	var final_danger_chance = get_location_danger_chance()
 
 	if has_trait("Curious"):
 		final_discovery_chance += curious_discovery_bonus_chance
+		final_danger_chance += curious_danger_bonus_chance
+		
+	if has_trait("Brave"):
+		final_danger_chance += brave_danger_bonus_chance
+		location_exp_gain += 1
 
-	final_discovery_chance = min(final_discovery_chance, 1.0)
+	if has_trait("Timid"):
+		final_danger_chance -= timid_danger_reduction
+		final_discovery_chance -= timid_discovery_penalty
+
+	final_discovery_chance = clamp(final_discovery_chance, 0.0, 1.0)
+	final_danger_chance = clamp(final_danger_chance, 0.0, 1.0)
 	
 	if randf() < final_discovery_chance:
 		gain_event("Discovery", event_data["Discovery"]["reward"])
@@ -186,7 +280,7 @@ func explore():
 
 		print("Discovered something new!")
 		
-	if randf() < get_location_danger_chance():
+	if randf() < final_danger_chance:
 		gain_event("Danger", event_data["Danger"]["reward"])
 
 		if randf() < tendency_data["Bravery"]["event_chance"]:
@@ -430,3 +524,18 @@ func use_item(item_name: String):
 			gain_affinity("Earth", 1)
 
 	stats_changed.emit()
+	
+func get_affinity_xp_modifier():
+	var modifier := 0.0
+	var location_affinity = get_location_affinity()
+
+	for affinity in affinities:
+		var affinity_level = get_affinity(affinity)
+
+		if affinity == location_affinity:
+			modifier += affinity_level * 0.01
+
+		elif location_affinity in domain_data[affinity]["weak_against"]:
+			modifier -= affinity_level * 0.01
+
+	return modifier
