@@ -19,3 +19,6 @@ func _on_use_ember_stone_button_pressed() -> void:
 
 func _on_use_crystal_button_pressed() -> void:
 	creature.use_item("Crystal")
+	
+func _on_use_fish_button_pressed() -> void:
+	creature.use_item("Fish")

@@ -90,6 +90,9 @@ var ember_stone_max_affinity := 2
 var crystal_min_affinity := 1
 var crystal_max_affinity := 2
 
+var fish_min_affinity := 0
+var fish_max_affinity := 1
+
 
 #==================================================
 # Gameplay Data
@@ -131,7 +134,19 @@ var location_data := {
 		"item": "Crystal",
 		"min_item": 1,
 		"max_item": 4
-	}
+	},
+	"Lake": {
+		"affinity": "Water",
+		"min_exp": 1,
+		"max_exp": 3,
+		"affinity_bonus": 0.1,
+		"affinity_gain_chance": 0.30,
+		"discovery_chance": 0.25,
+		"danger_chance": 0.25,
+		"item": "Fish",
+		"min_item": 1,
+		"max_item": 3
+	},
 }
 
 var trait_data := {
@@ -320,7 +335,7 @@ func explore():
 	await return_home()
 	
 	var item_amount = collect_items()
-	print("Found ", item_amount, " ", get_location_item())
+	add_log("Found " + str(item_amount) + " " + get_location_item())
 	
 	process_location_experience()
 	process_events()	
@@ -342,7 +357,7 @@ func use_item(item_name: String):
 		"Berry":
 			if energy >= max_energy:
 				inventory["Berry"] += 1
-				print("Energy Full!")
+				add_log("Energy Full!")
 				return
 			energy += random_range(berry_min_energy, berry_max_energy)
 			energy = min(energy, max_energy)
@@ -352,7 +367,12 @@ func use_item(item_name: String):
 
 		"Crystal":
 			gain_affinity("Earth", random_range(crystal_min_affinity, crystal_max_affinity))
-
+		
+		"Fish":
+			gain_affinity("Water", random_range(fish_min_affinity, fish_max_affinity))
+			energy += 5.0
+			energy = min(energy, max_energy)
+			
 	stats_changed.emit()
 	
 
@@ -364,12 +384,26 @@ func use_item(item_name: String):
 
 func can_explore():
 	if exploring:
-		print("Already exploring")
+		add_log("Already exploring")
 		return false
 
 	if energy < exploration_energy_cost:
-		print("Too tired to explore")
+		add_log("Too tired to explore")
 		return false
+	
+	var location_affinity = get_location_affinity()
+	var primary_affinity = get_primary_affinity()
+
+	if primary_affinity != "":
+		var dislikes = domain_data[primary_affinity].get("dislikes", [])
+		
+		if location_affinity in dislikes:
+			# Base 20% refusal, +1% per affinity level (capped at 80%)
+			var refusal_chance = min(0.2 + (get_affinity(primary_affinity) * 0.01), 0.8)
+			
+			if randf() < refusal_chance:
+				add_log("REFUSED! Creature dislikes " + location_affinity + " domains.")
+				return false
 
 	return true
 	
@@ -378,7 +412,7 @@ func start_exploration():
 	energy -= exploration_energy_cost
 	stats_changed.emit()
 
-	print("Creature left to explore")
+	add_log("Creature left to explore")
 	
 func travel_to_exploration():
 	var tween = create_tween()
@@ -447,7 +481,7 @@ func process_events():
 		if randf() < get_tendency_gain_chance("Curiosity"):
 			gain_tendency("Curiosity", random_range(tendency_min_gain, tendency_max_gain))
 
-		print("Discovered something new!")
+		add_log("Discovered something new!")
 		
 	if randf() < final_danger_chance:
 		gain_event("Danger", get_event_reward("Danger"))
@@ -458,7 +492,7 @@ func process_events():
 			else:
 				gain_tendency("Bravery", -1)
 
-		print("Danger encountered!")
+		add_log("Danger encountered!")
 
 func process_affinity_bonus():
 	var location_affinity = get_location_affinity()
@@ -473,7 +507,7 @@ func process_affinity_bonus():
 
 	if randf() < bonus_chance:
 		gain_experience(current_location, random_range(affinity_bonus_min_exp, affinity_bonus_max_exp))
-		print(location_affinity, " affinity bonus!")
+		add_log(location_affinity + " affinity bonus!")
 
 func process_affinity_growth():
 	var location_affinity = get_location_affinity()
@@ -488,7 +522,7 @@ func finish_exploration():
 	exploring = false
 	stats_changed.emit()
 
-	print("Creature returned")
+	add_log("Creature returned")
 
 
 
@@ -502,7 +536,7 @@ func gain_xp(amount):
 	while xp >= get_xp_threshold():
 		xp -= get_xp_threshold()
 		level += 1
-		print("Level Up! ", level)
+		add_log("Level Up! Level " + str(level))
 
 	stats_changed.emit()
 	
@@ -572,6 +606,17 @@ func get_affinity_xp_modifier():
 			modifier -= affinity_level * affinity_xp_modifier_per_level
 
 	return modifier
+	
+func get_primary_affinity() -> String:
+	var highest_affinity = ""
+	var max_val = 0
+	
+	for affinity in affinities:
+		if affinities[affinity] > max_val:
+			max_val = affinities[affinity]
+			highest_affinity = affinity
+			
+	return highest_affinity
 	
 	
 
@@ -735,4 +780,5 @@ func get_tendency_event_chance(tendency: String):
 func random_range(min_value: int, max_value: int):
 	return randi_range(min_value, max_value)
 	
-	
+func add_log(message: String):
+	print(message)
