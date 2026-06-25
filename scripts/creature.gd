@@ -735,3 +735,4 @@ func get_tendency_event_chance(tendency: String):
 func random_range(min_value: int, max_value: int):
 	return randi_range(min_value, max_value)
 	
+	
