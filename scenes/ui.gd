@@ -14,6 +14,7 @@ extends CanvasLayer
 @onready var location_label = $LocationLabel
 @onready var preference_label = $PreferenceLabel
 @onready var trait_label = $TraitLabel
+@onready var log_label = $LogLabel
 
 # ==========================================
 # Grouped Data Panels
@@ -26,6 +27,7 @@ extends CanvasLayer
 func _ready():
 	setup_layout()
 	creature.stats_changed.connect(update_ui)
+	creature.log_updated.connect(update_log)
 	update_ui()
 
 func setup_layout():
@@ -67,6 +69,12 @@ func setup_layout():
 	# Tendencies
 	tendencies_label.size = panel_size
 	tendencies_label.position = Vector2(right_x, start_y + right_spacing * 3)
+	
+	# ==========================================
+	# 3. Log
+	# ==========================================
+	log_label.size = Vector2(500, 150)
+	log_label.position = Vector2(300, 480)
 
 func update_ui():
 	# 1. Static Core Stats
@@ -109,3 +117,6 @@ func update_ui():
 		if creature.tendencies[tend] != 0: 
 			tend_text += "%s: %d\n" % [tend, creature.tendencies[tend]]
 	tendencies_label.text = tend_text
+	
+func update_log(message: String):
+	log_label.text += message + "\n"

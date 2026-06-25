@@ -255,7 +255,7 @@ var domain_data := {
 #==================================================
 
 signal stats_changed
-
+signal log_updated(message: String)
 
 
 
@@ -782,3 +782,4 @@ func random_range(min_value: int, max_value: int):
 	
 func add_log(message: String):
 	print(message)
+	log_updated.emit(message)
