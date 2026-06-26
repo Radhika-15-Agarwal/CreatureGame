@@ -1,6 +1,7 @@
 extends Node2D
 
 @onready var creature = $Creature
+@onready var save_manager = $SaveManager
 
 # ==========================================
 # Button Signals
@@ -22,3 +23,15 @@ func _on_use_crystal_button_pressed() -> void:
 	
 func _on_use_fish_button_pressed() -> void:
 	creature.use_item("Fish")
+
+# ==========================================
+# System Buttons
+# ==========================================
+func _on_save_button_pressed() -> void:
+	save_manager.save_game()
+
+func _on_load_button_pressed() -> void:
+	save_manager.load_game()
+
+func _on_reset_button_pressed() -> void:
+	save_manager.reset_game()
