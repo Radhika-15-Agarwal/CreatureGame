@@ -46,6 +46,12 @@ var exploration_duration := 2.0
 var exploration_distance := 300.0
 var travel_duration := 1.0
 
+# Petting
+var pets_since_explore := 0
+var current_pet_tolerance := 3 
+var min_pet_tolerance := 1
+var max_pet_tolerance := 5
+
 # Preferences
 var preference_threshold := 10
 
@@ -79,6 +85,9 @@ var affinity_bonus_max_exp := 2
 
 var brave_bonus_min_exp := 1
 var brave_bonus_max_exp := 2
+
+var petting_bonus_min_exp := 1
+var petting_bonus_max_exp := 3
 
 # Items
 var berry_min_energy := 8
@@ -174,6 +183,10 @@ var tendency_data := {
 	"Bravery": {
 		"event_chance": 0.5,
 		"gain_chance": 0.5
+	},
+	"Trust": {
+		"happy_gain_chance": 0.4, 
+		"okay_gain_chance": 0.1
 	}
 }
 
@@ -267,6 +280,10 @@ signal log_updated(message: String)
 
 func _ready():
 	home_position = position
+	
+	min_pet_tolerance = random_range(0, 3) 
+	max_pet_tolerance = random_range(min_pet_tolerance + 1, 6)
+	current_pet_tolerance = random_range(min_pet_tolerance, max_pet_tolerance)
 
 	initialize_locations()
 	initialize_affinities()
@@ -375,6 +392,39 @@ func use_item(item_name: String):
 			
 	stats_changed.emit()
 	
+func pet():
+	if exploring:
+		add_log("The creature is not home right now.")
+		return
+		
+	if pets_since_explore >= current_pet_tolerance:
+		add_log("The creature swats your hand away. It wants personal space.")
+		return
+		
+	pets_since_explore += 1 
+	var current_mood = get_mood()
+	
+	if current_mood == "Tired":
+		add_log("You gently pet the tired creature. It rests easier.")
+		energy += random_range(petting_bonus_min_exp, petting_bonus_max_exp)
+		energy = min(energy, max_energy)
+		
+	elif current_mood == "Happy":
+		add_log("The creature happily leans into your hand!")
+		
+		if randf() < tendency_data["Trust"]["happy_gain_chance"]:
+			gain_tendency("Trust", 1)
+			add_log("The creature trusts you a little more.")
+			
+	else: # "Okay" mood
+		add_log("You pet the creature. It seems content.")
+		
+		if randf() < tendency_data["Trust"]["okay_gain_chance"]:
+			gain_tendency("Trust", 1)
+			add_log("The creature trusts you a little more.")
+
+	stats_changed.emit()
+	
 
 
 
@@ -410,8 +460,11 @@ func can_explore():
 func start_exploration():
 	exploring = true
 	energy -= exploration_energy_cost
+	
+	pets_since_explore = 0
+	current_pet_tolerance = random_range(min_pet_tolerance, max_pet_tolerance)
+	
 	stats_changed.emit()
-
 	add_log("Creature left to explore")
 	
 func travel_to_exploration():

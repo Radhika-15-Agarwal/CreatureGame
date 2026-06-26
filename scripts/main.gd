@@ -11,6 +11,9 @@ func _on_explore_button_pressed():
 	
 func _on_location_button_pressed():
 	creature.switch_location()
+	
+func _on_pet_button_pressed() -> void:
+	creature.pet()
 
 func _on_use_berry_button_pressed() -> void:
 	creature.use_item("Berry")

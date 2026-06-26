@@ -9,6 +9,7 @@
 
 [node name="Main" type="Node2D" unique_id=1959341869]
 script = ExtResource("1_0wfyh")
+metadata/_edit_vertical_guides_ = [-16418.0]
 
 [node name="Creature" type="CharacterBody2D" parent="." unique_id=134566905]
 position = Vector2(200, 300)
@@ -99,23 +100,23 @@ offset_bottom = 51.0
 text = "Switch Location"
 
 [node name="UseBerryButton" type="Button" parent="UI" unique_id=1178855698]
-offset_left = 300.0
+offset_left = 330.0
 offset_top = 20.0
-offset_right = 384.0
+offset_right = 414.0
 offset_bottom = 51.0
 text = "Use Berry"
 
 [node name="UseEmberStoneButton" type="Button" parent="UI" unique_id=1299315584]
-offset_left = 400.0
+offset_left = 430.0
 offset_top = 20.0
-offset_right = 540.0
+offset_right = 570.0
 offset_bottom = 51.0
 text = "Use Ember Stone"
 
 [node name="UseCrystalButton" type="Button" parent="UI" unique_id=1503624767]
-offset_left = 560.0
+offset_left = 590.0
 offset_top = 20.0
-offset_right = 655.0
+offset_right = 685.0
 offset_bottom = 51.0
 text = "Use Crystal"
 
@@ -168,6 +169,14 @@ offset_right = 1111.0
 offset_bottom = 51.0
 text = "Reset"
 
+[node name="PetButton" type="Button" parent="UI" unique_id=399349661]
+offset_left = 250.0
+offset_top = 20.0
+offset_right = 300.0
+offset_bottom = 51.0
+text = "Pet
+"
+
 [node name="SaveManager" type="Node" parent="." unique_id=818043779]
 script = ExtResource("4_jyhfs")
 
@@ -180,3 +189,4 @@ script = ExtResource("4_jyhfs")
 [connection signal="pressed" from="UI/SaveButton" to="." method="_on_save_button_pressed"]
 [connection signal="pressed" from="UI/LoadButton" to="." method="_on_load_button_pressed"]
 [connection signal="pressed" from="UI/ResetButton" to="." method="_on_reset_button_pressed"]
+[connection signal="pressed" from="UI/PetButton" to="." method="_on_pet_button_pressed"]
