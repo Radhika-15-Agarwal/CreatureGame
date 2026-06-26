@@ -19,7 +19,11 @@ func save_game():
 		"pets_since_explore": creature.pets_since_explore,
 		"current_pet_tolerance": creature.current_pet_tolerance,
 		"min_pet_tolerance": creature.min_pet_tolerance,
-		"max_pet_tolerance": creature.max_pet_tolerance
+		"max_pet_tolerance": creature.max_pet_tolerance,
+		
+		# Economy
+		"coins": creature.coins,
+		"active_request": creature.active_request
 	}
 	
 	var file = FileAccess.open(save_path, FileAccess.WRITE)
@@ -44,6 +48,10 @@ func load_game():
 	creature.current_pet_tolerance = save_data.get("current_pet_tolerance", creature.current_pet_tolerance)
 	creature.min_pet_tolerance = save_data.get("min_pet_tolerance", creature.min_pet_tolerance)
 	creature.max_pet_tolerance = save_data.get("max_pet_tolerance", creature.max_pet_tolerance)
+	
+	# Load Economy Safely
+	creature.coins = save_data.get("coins", 0)
+	creature.active_request = save_data.get("active_request", {})
 	
 	# Load dictionaries safely
 	creature.inventory.merge(save_data.get("inventory", {}), true)

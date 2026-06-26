@@ -177,6 +177,21 @@ offset_bottom = 51.0
 text = "Pet
 "
 
+[node name="CoinLabel" type="Label" parent="UI" unique_id=1865538851]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Coins: 0"
+
+[node name="RequestLabel" type="Label" parent="UI" unique_id=581459655]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Request: No Request"
+
+[node name="FulfillRequestButton" type="Button" parent="UI" unique_id=2039563595]
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Fulfill Request"
+
 [node name="SaveManager" type="Node" parent="." unique_id=818043779]
 script = ExtResource("4_jyhfs")
 
@@ -190,3 +205,4 @@ script = ExtResource("4_jyhfs")
 [connection signal="pressed" from="UI/LoadButton" to="." method="_on_load_button_pressed"]
 [connection signal="pressed" from="UI/ResetButton" to="." method="_on_reset_button_pressed"]
 [connection signal="pressed" from="UI/PetButton" to="." method="_on_pet_button_pressed"]
+[connection signal="pressed" from="UI/FulfillRequestButton" to="." method="_on_fulfill_request_button_pressed"]

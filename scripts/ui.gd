@@ -1,6 +1,5 @@
 extends CanvasLayer
 
-# Grab the creature from the parent node (Main)
 @onready var creature = $"../Creature"
 
 # ==========================================
@@ -15,6 +14,10 @@ extends CanvasLayer
 @onready var preference_label = $PreferenceLabel
 @onready var trait_label = $TraitLabel
 @onready var log_label = $LogLabel
+
+# Economy Labels
+@onready var coin_label = $CoinLabel
+@onready var request_label = $RequestLabel
 
 # ==========================================
 # Grouped Data Panels
@@ -32,11 +35,34 @@ func _ready():
 
 func setup_layout():
 	# ==========================================
-	# 1. Left Side: Static Stats
+	# 1. Button Positioning (Child Nodes)
+	# ==========================================
+	var btn_row_1 = 15
+	var btn_row_2 = 55
+	
+	# System Buttons (Top Row)
+	$SaveButton.position = Vector2(30, btn_row_1)
+	$LoadButton.position = Vector2(130, btn_row_1)
+	$ResetButton.position = Vector2(230, btn_row_1)
+	
+	# Action Buttons (Second Row)
+	$ExploreButton.position = Vector2(30, btn_row_2)
+	$LocationButton.position = Vector2(110, btn_row_2)
+	$PetButton.position = Vector2(250, btn_row_2)
+	$FulfillRequestButton.position = Vector2(360, btn_row_2)
+	
+	# Item Buttons (Second Row, Right Side)
+	$UseBerryButton.position = Vector2(500, btn_row_2)
+	$UseEmberStoneButton.position = Vector2(590, btn_row_2)
+	$UseCrystalButton.position = Vector2(730, btn_row_2)
+	$UseFishButton.position = Vector2(830, btn_row_2)
+
+	# ==========================================
+	# 2. Left Side: Static Stats
 	# ==========================================
 	var left_x = 30
-	var start_y = 80 # Starts below your buttons
-	var spacing = 35 # Vertical space between each line
+	var start_y = 100 # Moved down slightly to accommodate 2 rows of buttons
+	var spacing = 35 
 
 	level_label.position = Vector2(left_x, start_y)
 	xp_label.position = Vector2(left_x, start_y + spacing * 1)
@@ -46,32 +72,32 @@ func setup_layout():
 	preference_label.position = Vector2(left_x, start_y + spacing * 5)
 	trait_label.position = Vector2(left_x, start_y + spacing * 6)
 	location_label.position = Vector2(left_x, start_y + spacing * 7)
+	
+	# Economy Placement
+	coin_label.position = Vector2(left_x, start_y + spacing * 9)
+	request_label.position = Vector2(left_x, start_y + spacing * 10)
 
 	# ==========================================
-	# 2. Right Side: Dynamic Panels (RichTextLabels)
+	# 3. Right Side: Dynamic Panels
 	# ==========================================
 	var right_x = 850
-	var panel_size = Vector2(250, 130) # Fixes the text getting cut off/scrollbars
-	var right_spacing = 140 # Space between the big boxes
+	var panel_size = Vector2(250, 130) 
+	var right_spacing = 140 
 
-	# Affinities
 	affinities_label.size = panel_size
 	affinities_label.position = Vector2(right_x, start_y)
 
-	# Experiences
 	experiences_label.size = panel_size
 	experiences_label.position = Vector2(right_x, start_y + right_spacing * 1)
 
-	# Inventory
 	inventory_label.size = panel_size
 	inventory_label.position = Vector2(right_x, start_y + right_spacing * 2)
 
-	# Tendencies
 	tendencies_label.size = panel_size
 	tendencies_label.position = Vector2(right_x, start_y + right_spacing * 3)
 	
 	# ==========================================
-	# 3. Log
+	# 4. Log
 	# ==========================================
 	log_label.size = Vector2(500, 150)
 	log_label.position = Vector2(300, 480)
@@ -87,13 +113,24 @@ func update_ui():
 	preference_label.text = "Preference: " + creature.get_preference()
 	trait_label.text = "Trait: " + creature.get_trait_text()
 
-	# Colorizing Energy based on tiredness
+	# Colorizing Energy
 	if creature.energy <= 20:
-		energy_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3)) # Red
+		energy_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3)) 
 	else:
-		energy_label.remove_theme_color_override("font_color") # Default
+		energy_label.remove_theme_color_override("font_color") 
+		
+	# 2. Economy Updates
+	coin_label.text = "Coins: %d" % creature.coins
+	if not creature.active_request.is_empty():
+		request_label.text = "Request: Bring %d %s\n(Reward: %d Coins)" % [
+			creature.active_request["amount"], 
+			creature.active_request["item"], 
+			creature.active_request["reward"]
+		]
+	else:
+		request_label.text = "Request: None"
 
-	# 2. Dynamic Dictionaries
+	# 3. Dynamic Dictionaries
 	var affinity_text = "--- Affinities ---\n"
 	for affinity in creature.affinities:
 		if creature.affinities[affinity] > 0:

@@ -291,6 +291,9 @@ func _ready():
 	initialize_tendencies()
 	initialize_events()
 
+	if active_request.is_empty():
+		generate_new_request()
+
 	print(experiences)
 	print(affinities)
 	print(inventory)
@@ -425,6 +428,41 @@ func pet():
 
 	stats_changed.emit()
 	
+
+func generate_new_request():
+	var possible_items = ["Berry", "Ember Stone", "Crystal", "Fish"]
+	var req_item = possible_items.pick_random()
+	var req_amount = random_range(2, 5)
+	
+	var req_reward = req_amount * random_range(5, 10) 
+	
+	active_request = {
+		"item": req_item, 
+		"amount": req_amount, 
+		"reward": req_reward
+	}
+	
+	stats_changed.emit()
+	add_log("New request posted: " + str(req_amount) + " " + req_item + "s.")
+
+
+func fulfill_request():
+	if active_request.is_empty():
+		return
+		
+	var req_item = active_request["item"]
+	var req_amount = active_request["amount"]
+	var req_reward = active_request["reward"]
+	
+	if get_item_count(req_item) >= req_amount:
+		inventory[req_item] -= req_amount
+		coins += req_reward
+		
+		add_log("Request complete! Earned " + str(req_reward) + " coins.")
+		generate_new_request() 
+	else:
+		add_log("Not enough " + req_item + "s. You need " + str(req_amount) + ".")
+
 
 
 
@@ -606,6 +644,12 @@ func gain_experience(experience_type: String, amount: int):
 func get_experience(experience_type: String):
 	return experiences.get(experience_type, 0)
 	
+
+#==================================================
+# Economy
+#==================================================
+var coins := 0
+var active_request := {}
 
 
 #==================================================

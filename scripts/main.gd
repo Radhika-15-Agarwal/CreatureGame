@@ -26,6 +26,9 @@ func _on_use_crystal_button_pressed() -> void:
 	
 func _on_use_fish_button_pressed() -> void:
 	creature.use_item("Fish")
+	
+func _on_fulfill_request_button_pressed() -> void:
+	creature.fulfill_request()
 
 # ==========================================
 # System Buttons
