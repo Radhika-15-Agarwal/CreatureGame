@@ -30,6 +30,16 @@ func _on_use_fish_button_pressed() -> void:
 func _on_fulfill_request_button_pressed() -> void:
 	creature.fulfill_request()
 
+func _on_buy_bed_button_pressed() -> void:
+	creature.buy_item("Cozy Bed")
+
+func _on_buy_seasoning_button_pressed() -> void:
+	creature.buy_item("Fire Seasoning")
+
+func _on_buy_flour_button_pressed() -> void:
+	creature.buy_item("Flour")
+
+
 # ==========================================
 # System Buttons
 # ==========================================

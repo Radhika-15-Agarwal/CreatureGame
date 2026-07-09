@@ -89,20 +89,6 @@ var brave_bonus_max_exp := 2
 var petting_bonus_min_exp := 1
 var petting_bonus_max_exp := 3
 
-# Items
-var berry_min_energy := 8
-var berry_max_energy := 12
-
-var ember_stone_min_affinity := 1
-var ember_stone_max_affinity := 2
-
-var crystal_min_affinity := 1
-var crystal_max_affinity := 2
-
-var fish_min_affinity := 0
-var fish_max_affinity := 1
-
-
 #==================================================
 # Gameplay Data
 #==================================================
@@ -370,31 +356,37 @@ func explore():
 func use_item(item_name: String):
 	if get_item_count(item_name) <= 0:
 		return
+		
+	var item_info = ItemData.ITEMS.get(item_name, {})
+	if item_info.is_empty() or not item_info.has("effects"):
+		add_log("Cannot use " + item_name + ".")
+		return
+
+	var effects = item_info["effects"]
+
+	# Energy Restore
+	if effects.has("energy_restore_min") and effects.has("energy_restore_max"):
+		if energy >= max_energy:
+			add_log("Energy is already full!")
+			return 
+			
+		var heal_amount = random_range(effects["energy_restore_min"], effects["energy_restore_max"])
+		energy += heal_amount
+		energy = min(energy, max_energy)
+		add_log("Used " + item_name + ": +" + str(heal_amount) + " Energy.")
+
+	# Affinity Gain
+	if effects.has("affinity_type") and effects.has("affinity_min"):
+		var aff_amount = random_range(effects["affinity_min"], effects["affinity_max"])
+		
+		if aff_amount > 0:
+			gain_affinity(effects["affinity_type"], aff_amount)
+			add_log("Used " + item_name + ": +" + str(aff_amount) + " " + effects["affinity_type"] + " Affinity.")
 
 	inventory[item_name] -= 1
-
-	match item_name:
-		"Berry":
-			if energy >= max_energy:
-				inventory["Berry"] += 1
-				add_log("Energy Full!")
-				return
-			energy += random_range(berry_min_energy, berry_max_energy)
-			energy = min(energy, max_energy)
-
-		"Ember Stone":
-			gain_affinity("Fire", random_range(ember_stone_min_affinity, ember_stone_max_affinity))
-
-		"Crystal":
-			gain_affinity("Earth", random_range(crystal_min_affinity, crystal_max_affinity))
-		
-		"Fish":
-			gain_affinity("Water", random_range(fish_min_affinity, fish_max_affinity))
-			energy += 5.0
-			energy = min(energy, max_energy)
-			
 	stats_changed.emit()
 	
+
 func pet():
 	if exploring:
 		add_log("The creature is not home right now.")
@@ -650,6 +642,7 @@ func get_experience(experience_type: String):
 #==================================================
 var coins := 0
 var active_request := {}
+var home_upgrades := []
 
 
 #==================================================
@@ -880,3 +873,85 @@ func random_range(min_value: int, max_value: int):
 func add_log(message: String):
 	print(message)
 	log_updated.emit(message)
+	
+	
+	
+	
+func is_item_unlocked(item_name: String) -> bool:
+	if not ItemData.ITEMS.has(item_name):
+		return false
+		
+	var item_info = ItemData.ITEMS[item_name]
+	
+	if not item_info.has("unlock"):
+		return true
+		
+	var reqs = item_info["unlock"]
+	
+	# Condition 1: Level Requirement
+	if reqs.has("level"):
+		if level < reqs["level"]:
+			return false
+			
+	# Condition 2: Location Requirement (Must have gained XP there)
+	if reqs.has("location"):
+		var required_loc = reqs["location"]
+		if get_experience(required_loc) <= 0:
+			return false
+			
+	return true
+	
+func buy_item(item_name: String):
+	if not ItemData.ITEMS.has(item_name):
+		add_log("Item doesn't exist.")
+		return
+		
+	var item_info = ItemData.ITEMS[item_name]
+	
+	if not item_info.get("buyable", false):
+		add_log(item_name + " is not for sale.")
+		return
+		
+	if not is_item_unlocked(item_name):
+		add_log(item_name + " is locked.")
+		return
+		
+	var cost = item_info["cost"]
+	
+	if coins < cost:
+		add_log("Not enough coins.")
+		return
+		
+	if item_info["category"] == "upgrade" and item_name in home_upgrades:
+		add_log("You already own the " + item_name + "!")
+		return
+		
+	coins -= cost
+	
+	if item_info["category"] == "upgrade":
+		home_upgrades.append(item_name)
+		apply_upgrades()
+		add_log("Purchased Home Upgrade: " + item_name + "!")
+	else:
+		if not inventory.has(item_name):
+			inventory[item_name] = 0
+		inventory[item_name] += 1
+		add_log("Bought " + item_name + " for " + str(cost) + " coins.")
+		
+	stats_changed.emit()
+	
+func apply_upgrades():
+	# 1. Reset to base stats first
+	energy_recovery_rate = 0.5 
+	
+	# 2. Apply safe, hardcoded effect routing
+	for upgrade_name in home_upgrades:
+		var item_info = ItemData.ITEMS[upgrade_name]
+		if item_info.has("effects"):
+			for effect in item_info["effects"]:
+				match effect:
+					"energy_recovery_rate":
+						energy_recovery_rate = item_info["effects"][effect]
+					# Example of how you add future effects:
+					# "max_energy":
+					# 	max_energy = item_info["effects"][effect]

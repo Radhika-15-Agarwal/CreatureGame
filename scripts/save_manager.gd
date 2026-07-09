@@ -23,7 +23,8 @@ func save_game():
 		
 		# Economy
 		"coins": creature.coins,
-		"active_request": creature.active_request
+		"active_request": creature.active_request,
+		"home_upgrades": creature.home_upgrades
 	}
 	
 	var file = FileAccess.open(save_path, FileAccess.WRITE)
@@ -52,6 +53,8 @@ func load_game():
 	# Load Economy Safely
 	creature.coins = save_data.get("coins", 0)
 	creature.active_request = save_data.get("active_request", {})
+	creature.home_upgrades = save_data.get("home_upgrades", [])
+	creature.apply_upgrades()
 	
 	# Load dictionaries safely
 	creature.inventory.merge(save_data.get("inventory", {}), true)

@@ -39,6 +39,11 @@ func setup_layout():
 	# ==========================================
 	var btn_row_1 = 15
 	var btn_row_2 = 55
+	var btn_row_3 = 95
+	
+	$BuyFlourButton.position = Vector2(30, btn_row_3)
+	$BuySeasoningButton.position = Vector2(160, btn_row_3)
+	$BuyBedButton.position = Vector2(310, btn_row_3)
 	
 	# System Buttons (Top Row)
 	$SaveButton.position = Vector2(30, btn_row_1)
@@ -147,6 +152,12 @@ func update_ui():
 	for item in creature.inventory:
 		if creature.inventory[item] > 0:
 			inv_text += "%s: %d\n" % [item, creature.inventory[item]]
+				
+	if creature.home_upgrades.size() > 0:
+		inv_text += "\n--- Upgrades ---\n"
+		for upgrade in creature.home_upgrades:
+			inv_text += "- " + upgrade + "\n"
+			
 	inventory_label.text = inv_text
 	
 	var tend_text = "--- Tendencies ---\n"
